@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gostart/auth"
 	"gostart/handler"
 	"gostart/user"
 
@@ -21,9 +22,10 @@ func main() {
 
 	fmt.Println("Database connected")
 
+	authService := auth.NewService()
 	userRepository := user.NewRepositry(db)
 	userService := user.NewService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")

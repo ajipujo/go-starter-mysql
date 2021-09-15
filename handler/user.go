@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gostart/auth"
 	"gostart/helper"
 	"gostart/user"
 	"net/http"
@@ -10,10 +11,11 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -41,7 +43,13 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	token := "tokentokentoken"
+	token, err := h.authService.GenerateToken(newUser.ID)
+
+	if err != nil {
+		response := helper.ApiResponse("Register Account Failed", http.StatusBadRequest, "failed", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
 
 	formatterUser := user.FormatterUser(newUser, token)
 	response := helper.ApiResponse("Account has been registered", http.StatusOK, "success", formatterUser)
