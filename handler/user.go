@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gostart/helper"
 	"gostart/user"
 	"net/http"
 
@@ -21,16 +22,28 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 	err := c.ShouldBindJSON(&input)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		errors := helper.FormatError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Register Account Failed", http.StatusUnprocessableEntity, "failed", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
 	newUser, err := h.userService.RegisterUser(input)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		errors := helper.FormatError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Register Account Failed", http.StatusBadRequest, "failed", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, newUser)
+	token := "tokentokentoken"
+
+	formatterUser := user.FormatterUser(newUser, token)
+	response := helper.ApiResponse("Account has been registered", http.StatusOK, "success", formatterUser)
+	c.JSON(http.StatusOK, response)
 }
