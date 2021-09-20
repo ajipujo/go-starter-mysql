@@ -3,6 +3,7 @@ package user
 import "gorm.io/gorm"
 
 type Repository interface {
+	FindUserByEmail(email string) (User, error)
 	SaveUser(user User) (User, error)
 }
 
@@ -22,4 +23,16 @@ func (r *repository) SaveUser(user User) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *repository) FindUserByEmail(email string) (User, error) {
+	user := User{}
+
+	err := r.db.Where("email = ?", email).Find(&user).Error
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, err
 }
