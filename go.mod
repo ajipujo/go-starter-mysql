@@ -28,3 +28,5 @@ require (
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
+
+require github.com/joho/godotenv v1.3.0 // indirect
