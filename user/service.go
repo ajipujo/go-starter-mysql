@@ -9,6 +9,8 @@ import (
 type Service interface {
 	RegisterUser(input RegisterUserInput) (User, error)
 	LoginUser(input LoginUserInput) (User, error)
+	FindUserByID(userID int) (User, error)
+	UpdateUser(userID int, input UpdateUserInput) (User, error)
 }
 
 type service struct {
@@ -34,7 +36,7 @@ func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
 	createUser.Password = string(passwordHash)
 	createUser.RoleID = 2
 
-	newUser, err := s.repository.SaveUser(createUser)
+	newUser, err := s.repository.Save(createUser)
 
 	if err != nil {
 		return newUser, err
@@ -65,4 +67,41 @@ func (s *service) LoginUser(input LoginUserInput) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *service) FindUserByID(userID int) (User, error) {
+	user, err := s.repository.GetUserByID(userID)
+
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, errors.New("user not found")
+	}
+
+	return user, nil
+}
+
+func (s *service) UpdateUser(userID int, input UpdateUserInput) (User, error) {
+	existUser, err := s.repository.GetUserByID(userID)
+
+	if err != nil {
+		return existUser, err
+	}
+
+	if existUser.ID == 0 {
+		return existUser, errors.New("user not found")
+	}
+
+	existUser.Name = input.Name
+	existUser.Email = input.Email
+
+	newUser, err := s.repository.Update(existUser)
+
+	if err != nil {
+		return newUser, err
+	}
+
+	return newUser, nil
 }

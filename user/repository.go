@@ -3,8 +3,10 @@ package user
 import "gorm.io/gorm"
 
 type Repository interface {
+	GetUserByID(userID int) (User, error)
 	FindUserByEmail(email string) (User, error)
-	SaveUser(user User) (User, error)
+	Save(user User) (User, error)
+	Update(user User) (User, error)
 }
 
 type repository struct {
@@ -15,8 +17,18 @@ func NewRepositry(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) SaveUser(user User) (User, error) {
+func (r *repository) Save(user User) (User, error) {
 	err := r.db.Create(&user).Error
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (r *repository) Update(user User) (User, error) {
+	err := r.db.Save(&user).Error
 
 	if err != nil {
 		return user, err
@@ -35,4 +47,15 @@ func (r *repository) FindUserByEmail(email string) (User, error) {
 	}
 
 	return user, err
+}
+
+func (r *repository) GetUserByID(userID int) (User, error) {
+	user := User{}
+	err := r.db.Where("id = ?", userID).Find(&user).Error
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }

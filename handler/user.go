@@ -90,6 +90,39 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 	}
 
 	formatterUser := user.FormatterUser(loggedInUser, token)
-	response := helper.ApiResponse("Successfuly Loggedin", http.StatusOK, "success", formatterUser)
+	response := helper.ApiResponse("Successfuly loggedin", http.StatusOK, "success", formatterUser)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) UpdateUser(c *gin.Context) {
+	input := user.UpdateUserInput{}
+
+	err := c.ShouldBindJSON(&input)
+
+	if err != nil {
+		errors := helper.FormatError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Update account failed", http.StatusUnprocessableEntity, "failed", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := currentUser.ID
+
+	newUser, err := h.userService.UpdateUser(userID, input)
+
+	if err != nil {
+		errors := helper.FormatError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Update account failed", http.StatusUnprocessableEntity, "failed", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	formatterUser := user.FormatterUser(newUser, "")
+	response := helper.ApiResponse("Update account success", http.StatusOK, "success", formatterUser)
 	c.JSON(http.StatusOK, response)
 }
