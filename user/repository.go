@@ -3,7 +3,7 @@ package user
 import "gorm.io/gorm"
 
 type Repository interface {
-	GetUserByID(userID int) (User, error)
+	FindUserByID(userID int) (User, error)
 	FindUserByEmail(email string) (User, error)
 	Save(user User) (User, error)
 	Update(user User) (User, error)
@@ -49,7 +49,7 @@ func (r *repository) FindUserByEmail(email string) (User, error) {
 	return user, err
 }
 
-func (r *repository) GetUserByID(userID int) (User, error) {
+func (r *repository) FindUserByID(userID int) (User, error) {
 	user := User{}
 	err := r.db.Where("id = ?", userID).Find(&user).Error
 

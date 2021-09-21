@@ -9,8 +9,9 @@ import (
 type Service interface {
 	RegisterUser(input RegisterUserInput) (User, error)
 	LoginUser(input LoginUserInput) (User, error)
-	FindUserByID(userID int) (User, error)
+	GetUserByID(userID int) (User, error)
 	UpdateUser(userID int, input UpdateUserInput) (User, error)
+	GetEmailAvailability(input CheckEmailAvailabilityInput) (bool, error)
 }
 
 type service struct {
@@ -69,8 +70,8 @@ func (s *service) LoginUser(input LoginUserInput) (User, error) {
 	return user, nil
 }
 
-func (s *service) FindUserByID(userID int) (User, error) {
-	user, err := s.repository.GetUserByID(userID)
+func (s *service) GetUserByID(userID int) (User, error) {
+	user, err := s.repository.FindUserByID(userID)
 
 	if err != nil {
 		return user, err
@@ -84,7 +85,7 @@ func (s *service) FindUserByID(userID int) (User, error) {
 }
 
 func (s *service) UpdateUser(userID int, input UpdateUserInput) (User, error) {
-	existUser, err := s.repository.GetUserByID(userID)
+	existUser, err := s.repository.FindUserByID(userID)
 
 	if err != nil {
 		return existUser, err
@@ -104,4 +105,20 @@ func (s *service) UpdateUser(userID int, input UpdateUserInput) (User, error) {
 	}
 
 	return newUser, nil
+}
+
+func (s *service) GetEmailAvailability(input CheckEmailAvailabilityInput) (bool, error) {
+	email := input.Email
+
+	userData, err := s.repository.FindUserByEmail(email)
+
+	if err != nil {
+		return false, errors.New("checking email failed.")
+	}
+
+	if userData.ID == 0 {
+		return true, nil
+	}
+
+	return false, nil
 }

@@ -36,6 +36,7 @@ func main() {
 
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/login", userHandler.LoginUser)
+	api.POST("/checkemailavailability", userHandler.CheckEmailAvailability)
 	api.PUT("/users", authMiddleware(authService, userService), userHandler.UpdateUser)
 
 	router.Run()
@@ -75,7 +76,7 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 
 		userID := int(claim["user_id"].(float64))
 
-		user, err := userService.FindUserByID(userID)
+		user, err := userService.GetUserByID(userID)
 
 		if err != nil {
 			error := helper.FormatError(err)
