@@ -1,6 +1,10 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"gostart/config"
+
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	FindUserByID(userID int) (User, error)
@@ -13,7 +17,8 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepositry(db *gorm.DB) *repository {
+func NewRepository() *repository {
+	db := config.DB()
 	return &repository{db}
 }
 

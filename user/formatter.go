@@ -4,6 +4,9 @@ type userFormatter struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`
 	Email  string `json:"email"`
+	Alamat string `json:"alamat"`
+	NoNik  string `json:"no_nik"`
+	NoTelp string `json:"no_telp"`
 	Token  string `json:"token"`
 	RoleID int    `json:"role_id"`
 }

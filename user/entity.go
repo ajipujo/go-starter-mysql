@@ -9,6 +9,9 @@ type User struct {
 	Password       string
 	RoleID         int
 	AvatarFileName string
+	Alamat         string
+	NoNik          string
+	NoTelp         string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }

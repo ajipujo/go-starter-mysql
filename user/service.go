@@ -19,8 +19,9 @@ type service struct {
 	repository Repository
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository}
+func NewService() *service {
+	userRepo := NewRepository()
+	return &service{userRepo}
 }
 
 func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
@@ -28,6 +29,9 @@ func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
 
 	createUser.Name = input.Name
 	createUser.Email = input.Email
+	createUser.Alamat = input.Alamat
+	createUser.NoNik = input.NoNik
+	createUser.NoTelp = input.NoTelp
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 
@@ -114,7 +118,7 @@ func (s *service) GetEmailAvailability(input CheckEmailAvailabilityInput) (bool,
 	userData, err := s.repository.FindUserByEmail(email)
 
 	if err != nil {
-		return false, errors.New("checking email failed.")
+		return false, errors.New("checking email failed")
 	}
 
 	if userData.ID == 0 {
